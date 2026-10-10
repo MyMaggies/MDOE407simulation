@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A1 · SPOT THE PATTERN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>:root{--ink:#070d18;--panel:#14243b;--panel2:#1b3050;--teal:#2A7F8E;--teal2:#5fc3d3;--gold:#f2c14e;--ok:#5fd38a;--bad:#ff7a70;--txt:#e8eef7;--mut:#9fb0c7;--line:#2d4668}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(1200px 700px at 50% 30%,#10213a,#070d18);color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+.px{font-family:"Press Start 2P","Courier New",monospace;letter-spacing:.5px}
+#hud{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#0b1626;border-bottom:3px solid #1d3a5c;flex-wrap:wrap}
+#hud h1{font-size:11px;margin:0;color:var(--gold);line-height:1.5;font-weight:400}
+#hud .sub{color:var(--mut);font-size:12px}
+#hud .grow{flex:1}
+#prog{font-size:13px;color:var(--txt);background:#10213a;border:2px solid var(--line);padding:3px 10px;border-radius:3px}
+.btn{font:700 13px system-ui,sans-serif;color:#fff;background:var(--teal);border:0;border-bottom:4px solid #1b5560;border-radius:4px;padding:8px 14px;cursor:pointer}
+.btn:hover{background:#34909f}.btn:active{transform:translateY(2px);border-bottom-width:2px}
+.btn.ghost{background:#1d3250;border-bottom-color:#12233a}.btn.ghost:hover{background:#27426a}
+.btn.gold{background:#c9972c;border-bottom-color:#8a6619;color:#1a1204}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,.opt:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px;position:relative}
+#cv{image-rendering:pixelated;image-rendering:crisp-edges;border:4px solid #0a1424;box-shadow:0 0 0 3px #3a6a8c,0 18px 50px rgba(0,0,0,.6);background:#000;max-width:100%;max-height:100%}
+#pad{display:none;position:absolute;left:14px;bottom:14px;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:4px;user-select:none;touch-action:none}
+#pad button{background:rgba(20,36,59,.8);border:2px solid var(--teal2);border-radius:8px;color:#fff;font-size:20px}
+#act{display:none;position:absolute;right:18px;bottom:24px;width:78px;height:78px;border-radius:50%;background:rgba(201,151,44,.9);border:3px solid #fff;font:700 22px system-ui;color:#1a1204}
+@media (pointer:coarse){#pad{display:grid}#act{display:block}}
+.overlay{position:fixed;inset:0;background:rgba(4,9,18,.74);display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}
+.panel{width:min(940px,100%);max-height:94vh;overflow:auto;background:var(--panel);border:3px solid var(--teal2);box-shadow:0 0 0 3px #04101e,10px 10px 0 rgba(0,0,0,.45);border-radius:4px;padding:20px 22px}
+.panel h2{margin:0 0 4px;font-size:21px}
+.panel h3{margin:16px 0 6px;font-size:15px;color:var(--teal2)}
+.panel p{margin:6px 0}
+.mut{color:var(--mut)}.small{font-size:13px}
+.row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.chip{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;background:#1f3a5f;border:1px solid var(--line);color:#cfe3ff}
+.note{background:#10213a;border-left:4px solid var(--gold);padding:8px 12px;border-radius:3px;margin:10px 0}
+.opts{display:grid;gap:8px;margin:6px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#10213a;border:2px solid var(--line);border-radius:5px;cursor:pointer}
+.opt:hover{border-color:var(--teal2)}
+.opt input{margin-top:4px;accent-color:#5fc3d3}
+.opt.sel{border-color:var(--teal2);background:#163253}
+.opt.good{border-color:var(--ok);background:#12311f}.opt.badc{border-color:var(--bad);background:#3a1818}
+.fb{margin-top:12px;padding:12px 14px;border-radius:5px;border:2px solid var(--line);background:#10213a}
+.fb.ok{border-color:var(--ok)}.fb.no{border-color:var(--bad)}.fb.hint{border-color:var(--gold)}
+.fb b.t{display:block;margin-bottom:2px}
+table.d{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+table.d th,table.d td{border:1px solid var(--line);padding:4px 8px;text-align:center}
+table.d th{background:#1b3050;color:#cfe3ff;font-weight:600}
+table.d td:first-child,table.d th:first-child{text-align:left}
+table.d tr.hl td{background:#1c3a2c}
+.bar{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.pcv{image-rendering:pixelated;background:linear-gradient(#27405f,#14243b);border:3px solid var(--line);border-radius:6px}
+.list{display:grid;gap:8px}
+.list button{text-align:left}
+.stm{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;background:#10213a;border:2px solid var(--line);border-radius:5px;margin-bottom:8px}
+.stm .src{font-size:12px;color:var(--mut)}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{font:600 12px system-ui;color:#cfe3ff;background:#1b3050;border:2px solid var(--line);border-radius:4px;padding:6px 9px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--teal);border-color:var(--teal2);color:#fff}
+.stm.good{border-color:var(--ok)}.stm.badc{border-color:var(--bad)}
+.stm .why{grid-column:1/-1;font-size:13px;color:#cfe3ff}
+textarea,input[type=text]{width:100%;background:#0b1626;color:var(--txt);border:2px solid var(--line);border-radius:5px;padding:9px 11px;font:inherit}
+.ck{margin:4px 0;font-size:14px}.ck.y{color:var(--ok)}.ck.n{color:var(--bad)}
+@media (max-width:640px){.panel{padding:14px}#hud h1{font-size:9px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<header id="hud"><h1 class="px">A1 · SPOT THE PATTERN</h1><span class="sub">Lumera Aesthetics · Module 1 · LO1</span><span class="grow"></span><span id="prog" aria-live="polite"></span><button class="btn ghost" id="bl">List view (accessible)</button><button class="btn ghost" id="bh">How to play</button></header>
+<main id="stage"><canvas id="cv" aria-label="Game view. An accessible list view is available from the top bar."></canvas>
+<div id="pad"><span></span><button data-d="U" aria-label="Up">▲</button><span></span><button data-d="L" aria-label="Left">◀</button><span></span><button data-d="R" aria-label="Right">▶</button><span></span><button data-d="D" aria-label="Down">▼</button><span></span></div>
+<button id="act" aria-label="Interact">E</button></main>
+<script>
+'use strict';
+const TILE=32,COLS=30,ROWS=17,W=COLS*TILE,H=ROWS*TILE;
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;return [c,g]}
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hexRGB(h){const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255]}
+function shade(hex,a){let [r,g,b]=hexRGB(hex);const f=a<0?0:255,t=Math.abs(a);r=Math.round((f-r)*t+r);g=Math.round((f-g)*t+g);b=Math.round((f-b)*t+b);return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}
+function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x,y,w,h)}
+function disc(g,cx,cy,r,c){g.fillStyle=c;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y));g.fillRect(cx-w,cy+y,w*2+1,1)}}
+function ell(g,cx,cy,rx,ry,c){g.fillStyle=c;for(let y=-ry;y<=ry;y++){const w=Math.floor(rx*Math.sqrt(1-(y*y)/(ry*ry)));g.fillRect(cx-w,cy+y,2*w+1,1)}}
+function outline(c,col){const g=c.getContext('2d'),w=c.width,h=c.height;const src=g.getImageData(0,0,w,h),d=src.data,o=new Uint8ClampedArray(d);const [r,gg,b]=hexRGB(col);
+  const A=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&d[(y*w+x)*4+3]>128;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if(d[i+3]<128&&(A(x-1,y)||A(x+1,y)||A(x,y-1)||A(x,y+1))){o[i]=r;o[i+1]=gg;o[i+2]=b;o[i+3]=255}}
+  g.putImageData(new ImageData(o,w,h),0,0)}
+
+/* ---------- characters: 16x24 cell design, 2px cells -> 32x48 sprites ---------- */
+function drawChar(o,dir,step){
+  const [c,g]=mk(32,48);const P=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x*2,y*2,w*2,h*2)};
+  const skin=o.skin,skinD=shade(skin,-.16),hair=o.hair,hairD=shade(hair,-.28),hairL=shade(hair,.2);
+  const shirt=o.shirt,shirtD=shade(shirt,-.22),shirtL=shade(shirt,.14),pants=o.pants,pantsD=shade(pants,-.28),shoe=o.shoe||'#2a2230';
+  const side=dir==='left'||dir==='right';
+  const ll=step===1?6:step===2?4:5,rl=step===2?6:step===1?4:5;
+  if(side){const a=step===1?-1:step===2?1:0;P(6+a,16,3,5,pants);P(6+a,21,4,1,shoe);P(8-a,16,3,5,pantsD);P(8-a,21,4,1,shoe)}
+  else{P(5,16,3,ll,pants);P(5,16,1,ll,pantsD);P(8,16,3,rl,pants);P(10,16,1,rl,pantsD);P(5,16+ll,3,1,shoe);P(8,16+rl,3,1,shoe)}
+  g.save();g.translate(0,(step?-1:0));
+  if(!side){
+    P(4,10,8,6,shirt);P(4,15,8,1,shirtD);P(5,10,2,1,shirtL);
+    P(3,10,1,5,shirtD);P(12,10,1,5,shirtD);P(3,15,1,1,skin);P(12,15,1,1,skin);
+    if(o.blazer&&dir==='down'){P(7,10,2,5,'#f2f4f8');P(6,10,1,5,shirtL);P(9,10,1,5,shirtL);if(o.tie)P(7,11,2,3,o.tie)}
+    else if(o.tie&&dir==='down'){P(7,10,2,4,o.tie)}
+    P(7,9,2,1,skinD);
+    if(dir==='down'){
+      P(4,2,8,7,skin);P(4,8,8,1,skinD);P(3,5,1,2,skin);P(12,5,1,2,skin);
+      hairStyle(P,o.style,hair,hairD,hairL,'down');
+      P(5,5,1,2,'#17151f');P(10,5,1,2,'#17151f');P(5,4,2,1,hairD);P(9,4,2,1,hairD);P(7,7,2,1,'#a8564c');P(5,7,1,1,shade(skin,.12));P(10,7,1,1,shade(skin,.12));
+      if(o.glasses){const f='#2c2c36';P(4,4,4,1,f);P(4,7,4,1,f);P(4,4,1,4,f);P(7,4,1,4,f);P(8,4,4,1,f);P(8,7,4,1,f);P(8,4,1,4,f);P(11,4,1,4,f);P(5,5,1,2,'#17151f');P(10,5,1,2,'#17151f')}
+    }else{
+      P(4,2,8,7,hair);P(4,8,8,1,hairD);P(5,3,3,1,hairL);
+      if(o.style==='long')P(3,3,10,9,hair),P(3,11,10,1,hairD);
+      else if(o.style==='bun'){P(6,0,4,2,hair)}
+      else if(o.style==='curly'){P(2,2,1,5,hair);P(13,2,1,5,hair);P(3,1,10,2,hair)}
+      P(7,9,2,1,skinD);
+    }
+  }else{
+    const a=step===1?-1:step===2?1:0;
+    P(5,10,6,6,shirt);P(5,15,6,1,shirtD);P(6+a,10,3,5,shirtD);P(6+a,15,3,1,skin);
+    P(7,9,2,1,skinD);
+    P(4,2,7,7,skin);P(4,8,7,1,skinD);P(8,5,1,2,skinD);
+    P(3,6,1,1,skin);P(5,5,1,2,'#17151f');P(5,4,2,1,hairD);P(5,7,2,1,'#a8564c');
+    hairStyle(P,o.style,hair,hairD,hairL,'side');
+    if(o.glasses){P(4,5,3,1,'#2c2c36');P(4,4,3,1,'#2c2c36');P(7,5,3,1,'#2c2c36');P(4,7,3,1,'#2c2c36');P(4,4,1,4,'#2c2c36')}
+  }
+  g.restore();outline(c,'#161224');return c}
+function hairStyle(P,st,h,hd,hl,view){
+  if(view==='down'){
+    if(st==='buzz'){P(4,2,8,1,h)}
+    else{P(4,1,8,2,h);P(3,2,1,3,h);P(12,2,1,3,h);P(4,3,8,1,h);P(5,1,3,1,hl);
+      if(st==='long'){P(3,3,2,8,h);P(11,3,2,8,h);P(3,10,2,1,hd);P(11,10,2,1,hd)}
+      if(st==='bun'){P(6,0,4,2,h);P(7,0,2,1,hl)}
+      if(st==='curly'){P(3,1,10,2,h);P(2,2,1,4,h);P(13,2,1,4,h);P(4,3,2,1,h);P(10,3,2,1,h);P(3,0,3,1,h);P(9,0,4,1,h)}
+      if(st==='side'){P(4,3,5,2,h)}}
+  }else{
+    P(4,1,8,2,h);P(5,1,3,1,hl);P(4,3,3,1,h);P(8,3,4,5,h);P(8,7,4,1,hd);
+    if(st==='long'){P(8,3,4,9,h);P(8,11,4,1,hd)}
+    if(st==='bun'){P(9,0,3,2,h)}
+    if(st==='curly'){P(7,0,5,1,h);P(8,3,5,5,h);P(3,3,1,2,h)}
+  }
+}
+function charSet(o){const S={down:[],up:[],left:[],right:[]};
+  for(const d of ['down','up','left'])for(let s=0;s<3;s++)S[d][s]=drawChar(o,d,s);
+  for(let s=0;s<3;s++){const [c,g]=mk(32,48);g.translate(32,0);g.scale(-1,1);g.drawImage(S.left[s],0,0);S.right[s]=c}
+  return S}
+const LOOKS={
+  you:{skin:'#e3b48f',hair:'#2b2118',style:'side',shirt:'#233d63',pants:'#1e2433',blazer:true,tie:'#c9972c',glasses:false},
+  mira:{skin:'#7a5240',hair:'#1c1412',style:'bun',shirt:'#b4436c',pants:'#2f3345'},
+  kit:{skin:'#e8c19e',hair:'#c9812f',style:'short',shirt:'#3c8d83',pants:'#3a3f55',glasses:true},
+  dana:{skin:'#c68b64',hair:'#3a2a24',style:'long',shirt:'#6b5ca8',pants:'#2f3345'},
+  theo:{skin:'#f0cfae',hair:'#6d4a2b',style:'curly',shirt:'#d98a3a',pants:'#3a3f55'},
+  noor:{skin:'#a06a4b',hair:'#161012',style:'long',shirt:'#2f8a5f',pants:'#2a2f40'},
+  ren:{skin:'#e0ad88',hair:'#222a3a',style:'buzz',shirt:'#8a8fa3',pants:'#2f3345',glasses:true},
+  alex:{skin:'#d9a37c',hair:'#4a3020',style:'short',shirt:'#c85a4a',pants:'#323850'},
+  pat:{skin:'#8c5e45',hair:'#101010',style:'curly',shirt:'#3f6fb5',pants:'#2f3345',glasses:true},
+  sam:{skin:'#d9a67f',hair:'#5a3a24',style:'side',shirt:'#4b7ea8',pants:'#343a4e'}
+};
+
+/* ---------- props ---------- */
+const WOOD='#a8744a';
+function propDesk(o={}){const [c,g]=mk(96,56);
+  R(g,0,12,96,24,WOOD);for(let i=0;i<24;i+=3)R(g,0,12+i,96,1,shade(WOOD,i%6?-.06:.05));
+  R(g,0,12,96,2,shade(WOOD,.28));R(g,0,34,96,2,shade(WOOD,-.2));
+  R(g,0,36,96,20,shade(WOOD,-.32));R(g,0,36,96,2,shade(WOOD,-.1));
+  R(g,5,41,40,11,shade(WOOD,-.45));R(g,51,41,40,11,shade(WOOD,-.45));R(g,22,45,6,2,'#d8c9a8');R(g,68,45,6,2,'#d8c9a8');
+  R(g,0,36,3,20,shade(WOOD,-.5));R(g,93,36,3,20,shade(WOOD,-.5));
+  if(o.monitor){R(g,34,0,28,22,'#1a2030');R(g,36,2,24,17,o.glow||'#3f7fa6');R(g,36,2,24,3,shade(o.glow||'#3f7fa6',.3));R(g,44,22,8,3,'#242a38');
+    if(o.icon==='mail'){R(g,42,7,12,9,'#e8eef7');R(g,42,7,12,1,'#9fb0c7');for(let i=0;i<6;i++)R(g,42+i,7+i*.5|0,1,1,'#9fb0c7')}}
+  else if(!o.bare){R(g,34,14,28,14,'#c7ccd6');R(g,34,14,28,2,'#eef1f6');R(g,45,20,6,3,'#9ca4b4')}
+  if(o.notes){R(g,30,3,8,8,'#f2d64b');R(g,64,6,8,8,'#f2a0b8');R(g,66,15,7,7,'#9fe0a8')}
+  R(g,74,22,7,8,'#e8e0d0');R(g,75,23,5,2,'#8a6a4a');
+  R(g,8,18,16,12,'#f4f1e8');for(let i=0;i<4;i++)R(g,10,20+i*2,12,1,'#b8b4a8');
+  if(o.bag){R(g,6,15,20,14,'#3a3f55');R(g,8,13,16,4,'#4a5070')}
+  return c}
+function propTerminal(glow){const [c,g]=mk(64,72);
+  R(g,0,48,64,24,shade(WOOD,-.1));R(g,0,48,64,3,shade(WOOD,.28));R(g,0,62,64,10,shade(WOOD,-.4));
+  R(g,6,2,52,40,'#161b28');R(g,9,5,46,31,glow);R(g,9,5,46,5,shade(glow,.3));
+  for(let i=0;i<4;i++)R(g,13,15+i*5,18+i*5,2,shade(glow,.5));
+  R(g,26,42,12,6,'#262c3c');R(g,18,46,28,3,'#2f3649');R(g,14,52,36,5,'#c0c6d2');R(g,16,53,32,1,'#e6eaf1');
+  return c}
+function propPlant(){const [c,g]=mk(40,64);
+  const lf=['#2f8a4f','#3fa862','#256f3f'];
+  for(const [x,y,rx,ry,k] of [[20,22,10,15,0],[10,30,8,12,1],[30,30,8,12,0],[20,12,6,10,1],[14,18,6,12,2],[27,17,6,11,2]])ell(g,x,y,rx,ry,lf[k]);
+  R(g,19,10,2,30,'#1f5f36');
+  R(g,10,42,20,18,'#b5623f');R(g,8,40,24,5,'#cf7a52');R(g,10,56,20,4,'#8a4a30');R(g,10,45,3,12,'#d6896a');return c}
+function propCooler(){const [c,g]=mk(32,64);
+  R(g,4,24,24,36,'#e8edf4');R(g,4,24,24,3,'#fff');R(g,4,56,24,4,'#b9c3d1');R(g,6,40,8,5,'#3a7fb5');R(g,18,40,8,5,'#c85a4a');R(g,8,48,16,6,'#b9c3d1');
+  R(g,6,4,20,22,'#8fd0ee');R(g,6,4,20,3,'#c9ecfa');R(g,8,12,16,12,'#5fb7df');R(g,9,6,3,16,'#d9f3ff');R(g,10,0,12,5,'#a6dcf3');return c}
+function propCoffee(){const [c,g]=mk(64,64);
+  R(g,0,30,64,34,shade(WOOD,-.15));R(g,0,30,64,4,shade(WOOD,.3));R(g,0,38,64,26,shade(WOOD,-.4));R(g,4,42,26,16,shade(WOOD,-.5));R(g,34,42,26,16,shade(WOOD,-.5));
+  R(g,8,2,26,30,'#2b303d');R(g,10,4,22,8,'#4a5368');R(g,12,6,6,4,'#5fd38a');R(g,14,18,14,10,'#1a1e28');R(g,18,22,6,10,'#d8dce6');
+  R(g,40,22,7,9,'#f2f2f2');R(g,50,22,7,9,'#d8564a');R(g,40,22,7,2,'#cfd3dc');return c}
+function propCabinet(){const [c,g]=mk(32,72);
+  R(g,0,6,32,66,'#8d97a8');R(g,0,6,32,3,'#c3cad6');R(g,0,68,32,4,'#5b6475');
+  for(let i=0;i<3;i++){const y=12+i*20;R(g,3,y,26,17,'#a2acbc');R(g,3,y,26,2,'#cdd3de');R(g,3,y+15,26,2,'#7b8597');R(g,11,y+6,10,3,'#4a5262');R(g,8,y+2,16,3,'#f4f1e8')}
+  return c}
+function propPedestal(){const [c,g]=mk(48,88);
+  R(g,6,46,36,40,'#e9edf3');R(g,6,46,36,4,'#fff');R(g,6,80,36,6,'#b6bfcc');R(g,10,56,28,2,'#c5ccd8');R(g,10,64,28,2,'#c5ccd8');R(g,16,70,16,5,'#2A7F8E');
+  ell(g,24,42,14,5,'#d8dee8');R(g,18,18,12,24,'#f6f8fb');R(g,18,18,4,24,'#fff');R(g,28,18,2,24,'#c8d0dc');
+  R(g,12,10,24,10,'#f1f4f8');R(g,12,10,24,2,'#fff');disc(g,24,10,9,'#2A7F8E');disc(g,24,10,6,'#7fe0ee');disc(g,24,10,3,'#e8ffff');
+  g.fillStyle='rgba(127,224,238,.25)';g.fillRect(8,0,32,3);return c}
+function propChair(){const [c,g]=mk(36,48);
+  R(g,6,4,24,28,'#2a3042');R(g,8,6,20,22,'#3a4258');R(g,8,6,20,3,'#566082');R(g,16,32,4,10,'#1a1e28');R(g,6,40,24,4,'#1a1e28');return c}
+function propTable(w=192,h=96){const [c,g]=mk(w,h);
+  R(g,0,6,w,h-28,'#8e5f3c');for(let i=0;i<h-28;i+=4)R(g,0,6+i,w,1,shade('#8e5f3c',i%8?-.06:.07));
+  R(g,0,6,w,3,shade('#8e5f3c',.3));R(g,0,h-24,w,4,shade('#8e5f3c',-.3));R(g,0,h-20,w,20,shade('#8e5f3c',-.45));
+  R(g,12,h-6,10,6,'#1a1e28');R(g,w-22,h-6,10,6,'#1a1e28');return c}
+function propDoor(open,w=64,h=96){const [c,g]=mk(w,h);
+  R(g,0,0,w,h,'#2b3446');R(g,4,4,w-8,h-4,open?'#0f1522':'#4a5873');
+  if(open){const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#cfeef5');gr.addColorStop(1,'#2e5a6a');g.fillStyle=gr;g.fillRect(8,8,w-16,h-8);R(g,8,8,6,h-8,'#0f1522');}
+  else{R(g,10,10,w-20,34,'#9fd3ea');R(g,10,10,w-20,5,'#dff3fa');R(g,w/2-1,10,2,34,'#4a5873');R(g,10,54,w-20,28,'#3b4660');R(g,14,58,w-28,20,'#44516e')}
+  R(g,w-18,48,6,10,'#d8c06a');
+  R(g,w/2-14,0,28,8,'#10182a');disc(g,w/2-7,4,2,open?'#5fd38a':'#ff5a4f');disc(g,w/2+7,4,2,open?'#5fd38a':'#401414');return c}
+function wallWindow(w=192,h=72,seed=3){const [c,g]=mk(w,h);const r=rng(seed);
+  const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#86c4e6');gr.addColorStop(1,'#eaf6fb');g.fillStyle=gr;g.fillRect(0,0,w,h);
+  for(let x=0;x<w;x+=14){const bh=18+r()*30;R(g,x,h-bh,12,bh,'#7f9fb8');R(g,x+1,h-bh,10,2,'#9fbcd2');for(let k=0;k<bh;k+=6)for(let j=3;j<10;j+=4)if(r()>.55)R(g,x+j-1,h-bh+4+k,2,3,'#d9ecf7')}
+  for(let x=5;x<w;x+=22){const bh=10+r()*20;R(g,x,h-bh,16,bh,'#a7bfd1')}
+  g.fillStyle='rgba(255,255,255,.55)';ell(g,38,16,18,4,'rgba(255,255,255,.7)');ell(g,w-50,24,22,4,'rgba(255,255,255,.55)');
+  R(g,0,0,w,4,'#f4f1ea');R(g,0,h-4,w,4,'#f4f1ea');R(g,0,0,4,h,'#f4f1ea');R(g,w-4,0,4,h,'#f4f1ea');R(g,w/2-2,0,4,h,'#f4f1ea');R(g,0,h-4,w,1,'#cfc9bb');return c}
+function wallScreen(vals,w=192,h=76){const [c,g]=mk(w,h);
+  R(g,0,0,w,h,'#10151f');R(g,5,5,w-10,h-10,'#17324f');R(g,5,5,w-10,10,'#1d4a73');
+  g.fillStyle='#cfe8ff';g.font='bold 8px monospace';g.fillText('TEAM AVG CLOSE RATE',10,13);
+  const n=vals.length,bw=(w-40)/n;R(g,10,h-16,w-20,1,'#4a6a8c');
+  vals.forEach((v,i)=>{const bh=Math.round(v*1.0);R(g,16+i*bw,h-16-bh,bw-14,bh,'#5fc3d3');R(g,16+i*bw,h-16-bh,bw-14,2,'#bff0f7');g.fillStyle='#e8f6ff';g.font='bold 8px monospace';g.fillText(v+'%',18+i*bw,h-19-bh);g.fillStyle='#8fb2d2';g.fillText('Q'+(i+1),20+i*bw,h-7)});
+  R(g,10,h-16-Math.round(30*1.0),w-20,1,'#f2c14e');return c}
+function whiteboard(w=160,h=68){const [c,g]=mk(w,h);
+  R(g,0,0,w,h,'#9aa3b2');R(g,4,4,w-8,h-12,'#f7f8fa');R(g,4,h-8,w-8,4,'#b9c0cd');
+  g.strokeStyle='#2A7F8E';g.lineWidth=2;g.beginPath();g.moveTo(14,40);g.lineTo(40,26);g.lineTo(66,34);g.lineTo(96,14);g.stroke();
+  R(g,104,14,40,2,'#c85a4a');R(g,104,22,32,2,'#3f6fb5');R(g,104,30,36,2,'#c85a4a');R(g,104,38,24,2,'#3f6fb5');R(g,14,48,60,2,'#8a8f9c');return c}
+function propSofa(){const [c,g]=mk(96,52);
+  R(g,0,8,96,24,'#37506f');R(g,0,8,96,4,'#4d6c92');R(g,6,22,84,20,'#456488');R(g,6,22,84,3,'#5a7ba3');R(g,0,16,10,30,'#2f4560');R(g,86,16,10,30,'#2f4560');R(g,8,46,6,6,'#1a1e28');R(g,82,46,6,6,'#1a1e28');return c}
+
+/* ---------- static room layers ---------- */
+function floorTile(base,seed){const [c,g]=mk(32,32);const r=rng(seed);
+  R(g,0,0,32,32,base);
+  for(let y=0;y<32;y+=2)for(let x=0;x<32;x+=2){const v=(r()-.5)*.1;R(g,x,y,2,2,shade(base,v))}
+  R(g,0,0,32,1,shade(base,-.18));R(g,0,0,1,32,shade(base,-.18));R(g,0,31,32,1,shade(base,.08));R(g,31,0,1,32,shade(base,.08));return c}
+function wallBand(w,h,col){const [c,g]=mk(w,h);R(g,0,0,w,h,col);
+  for(let x=0;x<w;x+=64){R(g,x,0,1,h,shade(col,-.08));R(g,x+1,0,1,h,shade(col,.1))}
+  R(g,0,0,w,3,shade(col,.2));return c}
+function buildRoom(opts){ // opts: {floorRegions:[{x,y,w,h,base}], extraWall:[{x,y,w,h}]}
+  const [c,g]=mk(W,H);
+  R(g,0,0,W,H,'#222a3a');
+  const fl=[0,1,2,3].map(i=>null);
+  for(const reg of opts.floorRegions){const vars=[floorTile(reg.base,reg.seed||1),floorTile(reg.base,(reg.seed||1)+7),floorTile(reg.base,(reg.seed||1)+13)];
+    const rr=rng(reg.seed||5);
+    for(let y=reg.y;y<reg.y+reg.h;y+=32)for(let x=reg.x;x<reg.x+reg.w;x+=32)g.drawImage(vars[Math.floor(rr()*3)],x,y)}
+  // back wall
+  const wb=wallBand(W,96,'#ebe6dc');g.drawImage(wb,0,0);
+  R(g,0,64,W,32,'#2d6f7c');R(g,0,64,W,3,'#4aa0b0');R(g,0,92,W,4,'#1d4a55');R(g,0,96,W,6,'rgba(0,0,0,.28)');
+  for(let x=0;x<W;x+=64){R(g,x,67,1,25,'#245a66')}
+  for(const e of (opts.extraWall||[])){g.drawImage(wallBand(e.w,e.h,e.col||'#d9d3c7'),e.x,e.y);R(g,e.x,e.y+e.h,e.w,6,'rgba(0,0,0,.25)')}
+  // window light on floor
+  for(const win of (opts.windows||[])){g.save();g.globalAlpha=.07;g.fillStyle='#fff';g.beginPath();g.moveTo(win.x,102);g.lineTo(win.x+win.w,102);g.lineTo(win.x+win.w+70,330);g.lineTo(win.x+70,330);g.closePath();g.fill();g.restore()}
+  // sign
+  if(opts.sign){const s=opts.sign;R(g,s.x,14,s.w,44,'#10182a');R(g,s.x+2,16,s.w-4,40,'#1d2b46');disc(g,s.x+22,36,10,'#f2c14e');disc(g,s.x+22,36,7,'#1d2b46');disc(g,s.x+22,36,3,'#7fe0ee');
+    g.fillStyle='#f6e7b8';g.font='bold 20px Georgia,serif';g.textBaseline='middle';g.fillText('L U M E R A',s.x+42,34);g.font='9px Georgia,serif';g.fillStyle='#9fb6d8';g.fillText('A E S T H E T I C S',s.x+43,50)}
+  // vignette
+  const v=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.38)');g.fillStyle=v;g.fillRect(0,0,W,H);
+  return c}
+
+/* ---------- game engine ---------- */
+class Game{
+  constructor(canvas,cfg){
+    this.cv=canvas;this.ctx=canvas.getContext('2d');this.cfg=cfg;this.blockers=cfg.blockers;this.items=cfg.items;this.npcs=cfg.npcs;this.inter=cfg.interactables;
+    this.p={x:cfg.start.x,y:cfg.start.y,dir:'up',step:0,t:0,set:charSet(LOOKS.you)};
+    this.keys={};this.paused=true;this.target=null;this.auto=null;this.time=0;this.near=null;this.stuck=0;this.vx=0;this.vy=0;
+    this.bind();this.resize();window.addEventListener('resize',()=>this.resize());
+    let last=performance.now();const loop=t=>{const dt=Math.min(.05,(t-last)/1000);last=t;this.time+=dt;if(!this.paused)this.update(dt);this.draw();requestAnimationFrame(loop)};requestAnimationFrame(loop)}
+  resize(){const st=this.cv.parentElement;const aw=st.clientWidth-28,ah=st.clientHeight-28;const s=Math.min(aw/W,ah/H);const cw=Math.max(320,Math.floor(W*s)),ch=Math.floor(cw*H/W);
+    const dpr=window.devicePixelRatio||1;this.cv.style.width=cw+'px';this.cv.style.height=ch+'px';this.cv.width=Math.round(cw*dpr);this.cv.height=Math.round(ch*dpr);this.k=this.cv.width/W}
+  bind(){
+    const typing=()=>/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName);
+    window.addEventListener('keydown',e=>{if(this.paused||typing())return;
+      if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+      this.keys[e.code]=true;if(['KeyE','Space','Enter'].includes(e.code))this.interact()});
+    window.addEventListener('keyup',e=>{this.keys[e.code]=false});
+    window.addEventListener('blur',()=>{this.keys={}});
+    this.cv.addEventListener('pointerdown',e=>{if(this.paused)return;const r=this.cv.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*W,y=(e.clientY-r.top)/r.height*H;
+      let hit=null,best=1e9;for(const i of this.inter){if(i.hidden)continue;const d=Math.hypot(x-(i.bx??i.x),y-(i.by??i.y)-0);if(d<46&&d<best){best=d;hit=i}}
+      if(hit){if(this.near===hit)this.interact();else{this.target={x:hit.x,y:hit.y+4};this.auto=hit.id}}else{this.target={x,y};this.auto=null}});
+    const pad=$('#pad');if(pad){const set=(d,on)=>{this['v'+d]=on};pad.querySelectorAll('button').forEach(b=>{const d=b.dataset.d;const dn=e=>{e.preventDefault();this.keys['pad'+d]=true};const up=e=>{e.preventDefault();this.keys['pad'+d]=false};b.addEventListener('pointerdown',dn);b.addEventListener('pointerup',up);b.addEventListener('pointerleave',up);b.addEventListener('pointercancel',up)})}
+    const act=$('#act');if(act)act.addEventListener('pointerdown',e=>{e.preventDefault();if(!this.paused)this.interact()});
+  }
+  hits(x,y){const L=x-7,Rr=x+7,T=y-6,B=y;const b=this.cfg.bounds;if(L<b.x0||Rr>b.x1||T<b.y0||B>b.y1)return true;
+    for(const r of this.blockers){if(r.off)continue;if(Rr>r.x&&L<r.x+r.w&&B>r.y&&T<r.y+r.h)return true}return false}
+  update(dt){const p=this.p,k=this.keys;let dx=0,dy=0;
+    if(k.ArrowLeft||k.KeyA||k.padL)dx--;if(k.ArrowRight||k.KeyD||k.padR)dx++;if(k.ArrowUp||k.KeyW||k.padU)dy--;if(k.ArrowDown||k.KeyS||k.padD)dy++;
+    if(dx||dy){this.target=null;this.auto=null}
+    else if(this.target){const tx=this.target.x-p.x,ty=this.target.y-p.y,d=Math.hypot(tx,ty);if(d<5){this.target=null}else{dx=tx/d;dy=ty/d}}
+    const l=Math.hypot(dx,dy);let moved=false;
+    if(l>0){dx/=l;dy/=l;const sp=132*dt;const ox=p.x,oy=p.y;
+      if(!this.hits(p.x+dx*sp,p.y))p.x+=dx*sp;if(!this.hits(p.x,p.y+dy*sp))p.y+=dy*sp;
+      moved=Math.hypot(p.x-ox,p.y-oy)>.05;
+      if(Math.abs(dx)>Math.abs(dy))p.dir=dx<0?'left':'right';else p.dir=dy<0?'up':'down';
+      if(this.target){this.stuck=moved?0:this.stuck+dt;if(this.stuck>.4){this.target=null;this.auto=null;this.stuck=0}}}
+    if(moved){p.t+=dt;p.step=1+(Math.floor(p.t*8)%2)}else{p.step=0}
+    let near=null,bd=1e9;for(const i of this.inter){if(i.hidden)continue;const d=Math.hypot(p.x-i.x,p.y-i.y);if(d<(i.r||56)&&d<bd){bd=d;near=i}}
+    this.near=near;if(this.auto&&near&&near.id===this.auto){this.auto=null;this.target=null;this.interact()}}
+  interact(){if(this.near&&this.cfg.onInteract){this.keys={};this.cfg.onInteract(this.near.id)}}
+  draw(){const g=this.ctx,k=this.k;g.setTransform(k,0,0,k,0,0);g.imageSmoothingEnabled=false;
+    g.drawImage(this.cfg.room,0,0);
+    const list=[];const t=this.time;
+    for(const it of this.items){if(it.hidden)continue;list.push({y:it.sort??(it.y+it.img.height),draw:()=>{if(it.shadow){g.fillStyle='rgba(0,0,0,.22)';const s=it.shadow;g.beginPath();g.ellipse(s.x,s.y,s.rx,s.ry,0,0,7);g.fill()}g.drawImage(it.img,it.x,it.y)}})}
+    for(const n of this.npcs){const bob=(Math.floor(t*1.6+(n.ph||0))%2)?-1:0;const fr=n.set[n.dir||'down'][0];list.push({y:n.sort??n.y,draw:()=>{if(!n.noShadow){g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(n.x,n.y-1,10,3.5,0,0,7);g.fill()}g.drawImage(fr,n.x-16,n.y-46+bob)}})}
+    const p=this.p;list.push({y:p.y,draw:()=>{g.fillStyle='rgba(0,0,0,.28)';g.beginPath();g.ellipse(p.x,p.y-1,10,3.5,0,0,7);g.fill();g.drawImage(p.set[p.dir][p.step],p.x-16,p.y-46)}});
+    list.sort((a,b)=>a.y-b.y);for(const l of list)l.draw();
+    if(this.cfg.overlay)this.cfg.overlay(g,t);
+    for(const n of this.npcs){if(!n.label)continue;this.tag(g,n.x,(n.tagY??(n.y-52)),n.label,n.mark)}
+    if(this.near&&!this.paused){const i=this.near;const bx=i.bx??i.x,by=(i.by??i.y)-20+Math.sin(t*5)*2;
+      g.font='bold 10px monospace';const txt='E  '+(i.prompt||'Interact');const w=g.measureText(txt).width+14;
+      g.fillStyle='#0b1626';g.fillRect(bx-w/2,by-11,w,20);g.fillStyle='#f2c14e';g.fillRect(bx-w/2,by-11,w,2);g.fillRect(bx-w/2,by+7,w,2);g.fillStyle='#f6f8fb';g.textBaseline='middle';g.textAlign='center';g.fillText(txt,bx,by);g.textAlign='left'}}
+  tag(g,x,y,label,mark){g.font='bold 10px monospace';const w=g.measureText(label).width+(mark?24:12);const bx=x-w/2;
+    g.fillStyle='rgba(11,22,38,.88)';g.fillRect(bx,y-8,w,16);g.fillStyle='#5fc3d3';g.fillRect(bx,y+6,w,2);
+    g.fillStyle='#fff';g.textBaseline='middle';g.textAlign='left';g.fillText(label,bx+6,y);
+    if(mark==='todo'){const b=Math.sin(this.time*6)*1.5;g.fillStyle='#f2c14e';g.fillRect(bx+w-14,y-5+b,3,7);g.fillRect(bx+w-14,y+3+b,3,2)}
+    else if(mark==='ok'){g.strokeStyle='#5fd38a';g.lineWidth=2;g.beginPath();g.moveTo(bx+w-17,y);g.lineTo(bx+w-13,y+4);g.lineTo(bx+w-6,y-4);g.stroke()}
+    else if(mark==='retry'){g.fillStyle='#ff9a70';g.fillRect(bx+w-14,y-5,3,7);g.fillRect(bx+w-14,y+3,3,2)}}
+}
+
+/* ---------- UI helpers ---------- */
+const UI={ov:null,
+  open(html,o={}){this.close(true);const ov=document.createElement('div');ov.className='overlay';ov.innerHTML='<div class="panel" role="dialog" aria-modal="true" tabindex="-1">'+html+'</div>';document.body.appendChild(ov);this.ov=ov;this.o=o;
+    if(window.G)window.G.paused=true;const p=ov.firstChild;const af=p.querySelector('[autofocus]')||p;setTimeout(()=>af.focus({preventScroll:true}),30);
+    ov.addEventListener('keydown',e=>{if(e.key==='Escape'&&o.closable!==false){e.preventDefault();this.close()}});return p},
+  close(silent){if(this.ov){this.ov.remove();this.ov=null}if(!silent){if(window.G)window.G.paused=false;if(this.o&&this.o.onClose)this.o.onClose()}}};
+function portrait(look,scale=4,dir='down'){const s=charSet(look);const c=document.createElement('canvas');c.width=32;c.height=48;c.getContext('2d').drawImage(s[dir][0],0,0);c.className='pcv';c.style.width=32*scale+'px';c.style.height=48*scale+'px';return c}
+function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+
+/* ===== A1 · Spot the Pattern ===== */
+const QL=['Q1 LY','Q2 LY','Q3 LY','Q4 LY','Q1','Q2','Q3'];
+const CLS={sustained:'Sustained underperformance',isolated:'Isolated issue',insufficient:'Insufficient evidence'};
+const CASES=[
+ {id:'mira',name:'Mira',role:'Senior Sales Rep',tenure:'4 years',metric:'Close rate (%)',target:30,vals:[34,33,35,32,33,34,21],team:[31,30,31,30,30,31,24],
+  rows:[['Proposals issued',[12,13,12,11,12,13,11]]],
+  note:'From mid-Q3, a new regional regulation required every clinic to re-sign consent paperwork before financing could proceed. It slowed pipelines across the whole region.',
+  ans:'isolated',det:['Mira’s close rate is below the 30% target','Mira is the longest-serving rep on the team','One weak quarter after six strong ones, with a team-wide dip for a known external reason'],ok:2,
+  hint:'Look at the whole history, not just the latest quarter, and ask what else changed for the rest of the team.',
+  why:'Six strong quarters, then one weak quarter in which the whole team dipped for a known outside reason. One data point with an explanation is not a pattern. Note it and watch it, but there is no performance concern to raise yet.'},
+ {id:'kit',name:'Kit',role:'Sales Rep',tenure:'3 years',metric:'Close rate (%)',target:30,vals:[33,32,31,29,26,22,18],team:[31,30,31,30,30,31,30],
+  rows:[['Proposals issued',[13,13,12,13,12,13,12]],['Demos delivered',[17,17,18,17,17,18,17]]],
+  note:'Demos and proposals have been steady. Nothing has changed in Kit’s territory, products or process.',
+  ans:'sustained',det:['Seven quarters of steady decline while the team average stays flat','Kit’s latest quarter is the lowest on record','Kit delivers about 17 demos every quarter'],ok:0,
+  hint:'Compare Kit’s line with the team’s line across the whole period, not just the end.',
+  why:'The fall runs across many quarters while the team average stays flat, and activity (demos, proposals) has held up, so the drop is further down the funnel. This is a pattern, not a blip: time for a performance conversation.'},
+ {id:'dana',name:'Dana',role:'Senior Sales Rep',tenure:'5 years',metric:'Quota attainment (%)',target:100,vals:[104,99,96,92,88,82,76],team:[101,100,99,100,99,100,98],
+  rows:[['Average discount (%)',[5,6,8,9,11,13,14]],['Team avg discount (%)',[6,6,7,6,7,6,7]]],
+  note:'Close rate has held at about 30%. Dana is closing deals, but at lower prices.',
+  ans:'sustained',det:['Dana’s close rate has held steady at about 30%','Dana is the most experienced rep','Quota attainment has fallen six quarters running while average discount rose from 5% to 14%'],ok:2,
+  hint:'Is close rate the only measure on the table? Look at the extra rows too.',
+  why:'One metric (close rate) looks fine, but quota attainment has slid for six quarters in a row while discounting nearly tripled. Reading one number alone would have hidden a sustained pattern.'},
+ {id:'theo',name:'Theo',role:'Sales Rep (new)',tenure:'5 months',metric:'Close rate (%)',target:30,vals:[12,16],team:[30,29],labels:['Q2','Q3'],
+  rows:[['Proposals issued',[5,8]]],
+  note:'Joined five months ago. Onboarding plans assume a three-quarter ramp-up before full targets apply.',
+  ans:'insufficient',det:['Only two quarters of data, and still inside the normal ramp-up period','Theo’s close rate is 12% and 16%, far below target','The team average is 30%'],ok:0,
+  hint:'How long has Theo been here, and what does the company expect of new joiners?',
+  why:'Two quarters of data from someone still in their ramp-up period cannot show underperformance. Support and monitor, then judge when there is a fair amount of data.'},
+ {id:'noor',name:'Noor',role:'Senior Sales Rep',tenure:'6 years',metric:'Close rate (%)',target:30,vals:[31,32,30,33,31,30,0],team:[30,31,30,31,30,31,30],
+  rows:[['Proposals issued',[12,13,12,12,13,12,2]]],
+  note:'Returned from six weeks of leave this quarter. Two proposals issued, both still in review: none has had time to close.',
+  ans:'insufficient',det:['Noor’s close rate is 0% this quarter','Only two proposals this quarter, after six steady quarters and six weeks away','Noor has six years of experience'],ok:1,
+  hint:'Check how many proposals sit behind that percentage.',
+  why:'0% looks alarming, but it rests on two proposals and an absence. The six quarters before it were steady. A small sample cannot tell you anything yet: check again next quarter.'},
+ {id:'ren',name:'Ren',role:'Sales Rep',tenure:'2 years',metric:'Close rate (%)',target:30,vals:[32,31,30,31,33,22],team:[30,30,31,30,30,30],labels:['Q4 LY','Q1','Q2','Q3','Q4 LY','Q3'],
+  rows:[['Proposals issued',[12,13,12,13,12,12]]],
+  note:'No known changes to Ren’s territory, products or process. Nobody has spoken to Ren about it yet.',
+  ans:'insufficient',det:['Ren’s close rate dropped 11 points','The team average is on target','One quarter below target, and no known cause yet'],ok:2,
+  hint:'What do you actually know about why? Can you yet tell an isolated blip from the start of a trend?',
+  why:'One weak quarter after a strong run is not sustained, but it is not safely “isolated” either, because you do not know why. Look at next quarter’s numbers and ask Ren what has changed before drawing a conclusion.'}
+];
+CASES.forEach(c=>{c.labels=QL.slice(-c.vals.length)});
+const LOOK={mira:LOOKS.mira,kit:LOOKS.kit,dana:LOOKS.dana,theo:LOOKS.theo,noor:LOOKS.noor,ren:LOOKS.ren};
+const state={};CASES.forEach(c=>state[c.id]={status:'todo',wrong:0,first:null,last:null});
+const done=()=>CASES.filter(c=>state[c.id].status==='ok').length;
+
+/* ---- room ---- */
+const room=buildRoom({floorRegions:[{x:0,y:96,w:960,h:448,base:'#7f8ca3',seed:3}],windows:[{x:40,w:192},{x:640,w:160}],sign:{x:338,w:244}});
+{const g=room.getContext('2d');g.drawImage(wallWindow(192,72,3),40,12);g.drawImage(wallWindow(160,72,9),640,12);
+}
+const items=[],blockers=[],npcs=[],inter=[];
+const deskImg=propDesk(),chairImg=propChair();
+const xs=[96,320,544],tops=[132,292],order=['mira','kit','dana','theo','noor','ren'];
+order.forEach((id,i)=>{const dx=xs[i%3],dt=tops[(i/3)|0],cx=dx+48,c=CASES.find(k=>k.id===id);
+  items.push({img:chairImg,x:cx-18,y:dt-14,sort:dt+20});
+  items.push({img:deskImg,x:dx,y:dt,sort:dt+56});
+  blockers.push({x:dx-4,y:dt-6,w:104,h:62});
+  const n={id,x:cx,y:dt+26,sort:dt+26,noShadow:true,set:charSet(LOOK[id]),label:c.name,tagY:dt-30,mark:'todo',ph:i*.7,dir:'down'};npcs.push(n);
+  inter.push({id,x:cx,y:dt+76,r:58,bx:cx,by:dt+44,prompt:'Review '+c.name+'’s scorecard'})});
+const plantI=propPlant(),cool=propCooler(),ped=propPedestal(),sofa=propSofa(),cab=propCabinet();
+[[6,452],[906,452],[6,106]].forEach(([x,y])=>{items.push({img:plantI,x,y,sort:y+64,shadow:{x:x+20,y:y+62,rx:13,ry:4}});blockers.push({x:x+8,y:y+48,w:24,h:14})});
+items.push({img:cool,x:792,y:296,sort:360,shadow:{x:808,y:358,rx:13,ry:4}});blockers.push({x:794,y:334,w:28,h:26});
+items.push({img:ped,x:708,y:150,sort:238,shadow:{x:732,y:236,rx:22,ry:5}});blockers.push({x:712,y:206,w:40,h:32});
+items.push({img:sofa,x:716,y:448,sort:500,shadow:{x:764,y:498,rx:46,ry:5}});blockers.push({x:716,y:462,w:96,h:36});
+const doorShut=propDoor(false),doorOpen=propDoor(true);const door={img:doorShut,x:832,y:0,sort:60};items.push(door);
+inter.push({id:'door',x:864,y:134,r:46,bx:864,by:120,prompt:'Case-File Room',hidden:false});
+/* decorative caption on pedestal */
+function overlay(g){g.font='bold 9px monospace';g.fillStyle='rgba(11,22,38,.85)';g.fillRect(698,244,68,14);g.fillStyle='#7fe0ee';g.textAlign='center';g.textBaseline='middle';g.fillText('LUMERA AURA',732,251);g.textAlign='left'}
+
+window.G=new Game($('#cv'),{room,items,blockers,npcs,interactables:inter,start:{x:480,y:470},bounds:{x0:8,x1:952,y0:108,y1:536},overlay,
+  onInteract:id=>{id==='door'?openDoor():openCase(id)}});
+
+/* ---- HUD ---- */
+function hud(){$('#prog').textContent='Scorecards reviewed: '+done()+' / '+CASES.length;
+  npcs.forEach(n=>{const s=state[n.id];n.mark=s.status==='ok'?'ok':s.wrong?'retry':'todo'});
+  if(done()===CASES.length&&door.img!==doorOpen){door.img=doorOpen}}
+hud();
+
+/* ---- chart ---- */
+function chart(c){const n=c.vals.length,w=600,h=230,pl=44,pr=14,pt=26,pb=38;const mx=Math.max(...c.vals,...c.team,c.target)*1.18;const bw=(w-pl-pr)/n;const y=v=>pt+(h-pt-pb)*(1-v/mx);
+  let s=`<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:620px;display:block" role="img" aria-label="${esc(c.metric)} by quarter for ${c.name}: ${c.vals.join(', ')}. Team average: ${c.team.join(', ')}. Target ${c.target}.">`;
+  s+=`<rect width="${w}" height="${h}" fill="#0f1c30" rx="6"/>`;
+  for(let i=0;i<=4;i++){const v=mx*i/4,yy=y(v);s+=`<line x1="${pl}" x2="${w-pr}" y1="${yy}" y2="${yy}" stroke="#25405f" stroke-width="1"/><text x="${pl-6}" y="${yy+4}" text-anchor="end" font-size="11" fill="#8fa6c4">${Math.round(v)}</text>`}
+  c.vals.forEach((v,i)=>{const x=pl+i*bw+bw*.2,bwd=bw*.6;s+=`<rect x="${x}" y="${y(v)}" width="${bwd}" height="${Math.max(1,y(0)-y(v))}" fill="#2A7F8E"/><rect x="${x}" y="${y(v)}" width="${bwd}" height="3" fill="#7fe0ee"/><text x="${x+bwd/2}" y="${y(v)-5}" text-anchor="middle" font-size="12" font-weight="700" fill="#e8f6ff">${v}</text><text x="${x+bwd/2}" y="${h-pb+16}" text-anchor="middle" font-size="11" fill="#8fa6c4">${c.labels[i]}</text>`});
+  const pts=c.team.map((v,i)=>`${pl+i*bw+bw/2},${y(v)}`).join(' ');s+=`<polyline points="${pts}" fill="none" stroke="#e8eef7" stroke-width="2.5" stroke-dasharray="1 5" stroke-linecap="round"/>`;
+  c.team.forEach((v,i)=>{s+=`<circle cx="${pl+i*bw+bw/2}" cy="${y(v)}" r="3.5" fill="#fff"/>`});
+  s+=`<line x1="${pl}" x2="${w-pr}" y1="${y(c.target)}" y2="${y(c.target)}" stroke="#f2c14e" stroke-width="2" stroke-dasharray="7 4"/><text x="${w-pr}" y="${y(c.target)-5}" text-anchor="end" font-size="11" font-weight="700" fill="#f2c14e">Target ${c.target}</text>`;
+  s+=`<text x="${pl}" y="15" font-size="12" fill="#cfe3ff" font-weight="700">${esc(c.metric)}</text><text x="${w-pr}" y="15" text-anchor="end" font-size="11" fill="#cfe3ff">▮ rep   ⋯ team average</text></svg>`;return s}
+function table(c){const th=c.labels.map(l=>`<th>${l}</th>`).join('');const row=(lab,v,hl)=>`<tr${hl?' class="hl"':''}><td>${lab}</td>${v.map(x=>`<td>${x}</td>`).join('')}</tr>`;
+  return `<table class="d"><tr><th></th>${th}</tr>${row(c.name+' · '+c.metric,c.vals,1)}${row('Team average',c.team)}${c.rows.map(r=>row(r[0],r[1])).join('')}</table>`}
+
+/* ---- case panel ---- */
+function openCase(id){const c=CASES.find(k=>k.id===id),s=state[id];
+  const p=UI.open(`<div class="row"><div id="pt"></div><div style="flex:1;min-width:260px"><span class="chip">A1 · Spot the Pattern</span><h2>${c.name} <span class="mut small">· ${c.role} · ${c.tenure} at Lumera</span></h2>
+   <div class="note small"><b>Context:</b> ${esc(c.note)}</div></div></div>
+   ${chart(c)}${table(c)}
+   <h3>1 · How would you classify this?</h3><div class="opts" id="o1">${Object.entries(CLS).map(([k,v])=>`<label class="opt"><input type="radio" name="cls" value="${k}"><span><b>${v}</b></span></label>`).join('')}</div>
+   <h3>2 · Which detail decided it?</h3><div class="opts" id="o2">${c.det.map((d,i)=>`<label class="opt"><input type="radio" name="det" value="${i}"><span>${esc(d)}</span></label>`).join('')}</div>
+   <div id="fb" aria-live="polite"></div>
+   <div class="bar"><button class="btn ghost" id="bk">Back to the floor</button><button class="btn gold" id="sub" autofocus>Submit my answer</button></div>`,{closable:true,onClose:hud});
+  $('#pt',p).appendChild(portrait(LOOK[id],4));
+  const radios=[...p.querySelectorAll('input')];radios.forEach(r=>r.addEventListener('change',()=>{p.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked))}));
+  $('#bk',p).onclick=()=>UI.close();
+  const submit=$('#sub',p);
+  function lock(){radios.forEach(r=>r.disabled=true)}
+  if(s.status==='ok'){radios.find(r=>r.name==='cls'&&r.value===c.ans).checked=true;radios.find(r=>r.name==='det'&&+r.value===c.ok).checked=true;p.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));lock();submit.style.display='none';
+    $('#fb',p).innerHTML=`<div class="fb ok"><b class="t">Reviewed · ${CLS[c.ans]}</b>${esc(c.why)}</div>`;return}
+  submit.onclick=()=>{const cl=(p.querySelector('input[name=cls]:checked')||{}).value,dt=(p.querySelector('input[name=det]:checked')||{}).value;
+    const fb=$('#fb',p);if(!cl||dt===undefined){fb.innerHTML='<div class="fb hint"><b class="t">Choose both answers</b>Pick a classification and the detail that decided it.</div>';return}
+    const okC=cl===c.ans,okD=+dt===c.ok;if(s.first===null)s.first=okC&&okD;
+    if(okC&&okD){s.status='ok';fb.innerHTML=`<div class="fb ok"><b class="t">Right: ${CLS[c.ans]}</b>${esc(c.why)}</div>`;lock();submit.style.display='none';hud();
+      if(done()===CASES.length){$('#bk',p).textContent='Back to the floor';const b=document.createElement('button');b.className='btn gold';b.textContent='All six reviewed: open the door →';b.onclick=()=>{UI.close();setTimeout(openDoor,50)};$('#bk',p).after(b);b.focus()}return}
+    s.wrong++;p.querySelectorAll('.opt').forEach(o=>o.classList.remove('good','badc'));
+    let msg=[];if(!okC)msg.push('Your classification doesn’t fit the evidence yet.');if(!okD)msg.push('The detail you chose isn’t what decides this case.');
+    if(s.wrong>=2){radios.forEach(r=>{const good=(r.name==='cls'&&r.value===c.ans)||(r.name==='det'&&+r.value===c.ok);if(good)r.closest('.opt').classList.add('good')});
+      fb.innerHTML=`<div class="fb no"><b class="t">Let’s walk through it</b>${esc(c.why)}<br><span class="mut small">The correct answers are highlighted. Select them and submit to mark this case as reviewed.</span></div>`}
+    else fb.innerHTML=`<div class="fb hint"><b class="t">Not quite yet. Try again, as often as you like.</b>${msg.join(' ')} <span class="mut">Hint: ${esc(c.hint)}</span></div>`;
+    hud()}}
+
+/* ---- door / completion ---- */
+function openDoor(){
+  if(done()<CASES.length){UI.open(`<h2>The Case-File Room is locked</h2><p>Review all six scorecards to unlock it. You have done <b>${done()}</b> of ${CASES.length}.</p><div class="bar"><button class="btn gold" autofocus id="ok">Back to the floor</button></div>`);$('#ok').onclick=()=>UI.close();return}
+  const first=CASES.filter(c=>state[c.id].first).length;
+  UI.open(`<span class="chip">Level complete</span><h2>The door is open: Module 1 done</h2>
+   <p>You read six scorecards and separated <b>sustained</b> underperformance from <b>isolated</b> issues and cases with <b>insufficient evidence</b>. You got <b>${first}</b> of 6 right on the first try, and unlimited retries are what make this a safe place to learn.</p>
+   <table class="d"><tr><th>Rep</th><th>Classification</th><th>Deciding detail</th></tr>${CASES.map(c=>`<tr><td>${c.name} ${state[c.id].first?'✓':''}</td><td>${CLS[c.ans]}</td><td style="text-align:left">${esc(c.det[c.ok])}</td></tr>`).join('')}</table>
+   <div class="note small"><b>What this practised (LO1):</b> identify indicators of underperformance and distinguish sustained from isolated issues. Three of the six were deliberately “insufficient evidence”, because new managers tend to over-diagnose.</div>
+   <p class="mut small">Next in the course: <b>A2 · Case-File Analysis</b> (separate file), where the door leads.</p>
+   <div class="bar"><button class="btn ghost" id="again">Replay this level</button><button class="btn gold" id="cl" autofocus>Close</button></div>`);
+  $('#cl').onclick=()=>UI.close();$('#again').onclick=()=>location.reload()}
+
+/* ---- list view (accessible route), help ---- */
+function openList(){const p=UI.open(`<h2>Accessible list view</h2><p class="mut small">The same six cases without walking around. Everything is keyboard and screen-reader friendly.</p><div class="list">${CASES.map(c=>`<button class="btn ghost" data-id="${c.id}">${c.name} · ${c.role} — ${state[c.id].status==='ok'?'reviewed ✓':'to review'}</button>`).join('')}<button class="btn ghost" data-id="door">Case-File Room (${done()===CASES.length?'open':'locked'})</button></div><div class="bar"><button class="btn gold" id="x" autofocus>Close</button></div>`);
+  p.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;UI.close();setTimeout(()=>id==='door'?openDoor():openCase(id),30)});$('#x',p).onclick=()=>UI.close()}
+function openHelp(){UI.open(`<h2>How to play</h2><p><b>Move:</b> WASD or arrow keys, or click/tap the floor. <b>Interact:</b> E, Space or Enter when the prompt appears (or click the character).</p><p><b>Goal:</b> walk up to each rep and review the scorecard. Decide whether it shows <b>sustained underperformance</b> (a pattern across several periods), an <b>isolated issue</b> (one data point with a known reason) or <b>insufficient evidence</b> (too little data or too small a sample to tell). Then name the detail that decided it.</p><p class="mut small">No scores are held against you. Try again as often as you like.</p><div class="bar"><button class="btn gold" id="x" autofocus>Got it</button></div>`);$('#x').onclick=()=>UI.close()}
+$('#bl').onclick=openList;$('#bh').onclick=openHelp;
+UI.open(`<span class="chip">Module 1 · Activity A1 · Learning outcome 1</span><h2 class="px" style="font-size:18px;line-height:1.5;margin:10px 0">SPOT THE PATTERN</h2>
+ <p>It is the <b>start of Q4</b> at <b>Lumera Aesthetics</b>, which sells high-value aesthetic laser and body-contouring equipment. You are the new regional sales manager, and before your one-to-ones you want to know where each of your six reps really stands.</p>
+ <p>Walk the sales floor, read each scorecard, and decide: <b>sustained underperformance</b>, an <b>isolated issue</b>, or <b>insufficient evidence</b>?</p>
+ <div class="note small">Move with <b>WASD / arrows</b> or tap the floor. Press <b>E</b> next to a rep. Prefer not to walk around? Use <b>List view</b> at the top.</div>
+ <div class="bar"><button class="btn ghost" id="st2">Start with list view</button><button class="btn gold" id="st" autofocus>Start</button></div>`,{closable:false});
+$('#st').onclick=()=>UI.close();$('#st2').onclick=()=>{UI.close();setTimeout(openList,30)};
+
+</script></body></html>
